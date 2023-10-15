@@ -194,16 +194,19 @@ class SNN:
 
         # Starting training
         for epoch in range(self.parameters.epochs):
-            
+            print(f"epoch: {epoch}")
             # If data is not preprocessed, the data is going to be converted again for each epoch
             if not self.parameters.use_tf_dataset and not self.parameters.preprocessing_data:
                 X_train, Y_train = X_train_generator(), Y_train_generator()
                 X_test, Y_test = X_test_generator(), Y_test_generator()
 
             # Iterating over each image and coresponding label
+            i=0
             for image, label in zip(X_train, Y_train):
                 time_start = time.time()
-
+                if i%20 == 0:
+                    print(f"{i} images trained")
+                i += 1
                 if self.parameters.preprocessing_data:
                     spike_train = image
                 else:
@@ -256,7 +259,7 @@ class SNN:
                 if neuron_labels_lookup[layer2_index] == -1:
                     for layer1_index in range(self.parameters.layer1_size):
                         synapses[layer2_index][layer1_index] = 0
-"""         
+"""
             # Accuracy tested against test dataset after each epoch
             if self.parameters.testing:
                 testing_accuracy = self.test(synapses, neuron_labels_lookup, (X_test, Y_test))

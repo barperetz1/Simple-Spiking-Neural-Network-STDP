@@ -12,7 +12,7 @@ class Parameters:
     train_dataset_path = "MNIST/training/"
     test_dataset_path = "MNIST/testing/"
     preprocessing_data = False
-    training_images_amount = 800
+    training_images_amount = 160
     test_images_amount = 100
     use_tf_dataset: bool = True
     plotting_potentials = False
@@ -42,11 +42,11 @@ class Parameters:
     # STDP Parameters
     STDP_offset = 0  # STDP Offset
     sigma = 0.01  # STDP Learning Rate
-    A_plus = 0.8  # Scaling Factor for Training Purposes - Decreasing Synpatic Weights
-    A_minus = 0.3  # Scaling Factor for Training Purposes - Increasing Synpatic Weights
-    tau_plus = 5  # STDP Time Constant in "μs" - Can be changed as Hyperparameter(?)
-    tau_minus = 5  # STDP Time Constant in "μs" - Can be changed as Hyperparameter(?)
-    mu = 0.9  # Exponential Factor
+    A_plus = 0.5  # Scaling Factor for Training Purposes - Decreasing Synpatic Weights
+    A_minus = 0.5  # Scaling Factor for Training Purposes - Increasing Synpatic Weights
+    tau_plus = 1  # STDP Time Constant in "μs" - Can be changed as Hyperparameter(?)
+    tau_minus = 1  # STDP Time Constant in "μs" - Can be changed as Hyperparameter(?)
+    mu = 1  # Exponential Factor
 
     # Receptive Field
     weight1 = 0.625
