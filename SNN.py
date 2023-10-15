@@ -97,9 +97,9 @@ class SNN:
     # STDP reinforcement learning curve
     def STDP_weighting_curve(self, delta_time: int):
         if delta_time > 0:
-            return -self.parameters.A_plus * (np.exp(-float(delta_time) / self.parameters.tau_plus) - self.parameters.STDP_offset)
+            return -self.parameters.A_plus * (2**(-float(delta_time) / self.parameters.tau_plus) - self.parameters.STDP_offset)
         if delta_time <= 0:
-            return self.parameters.A_minus * (np.exp(float(delta_time) / self.parameters.tau_minus) - self.parameters.STDP_offset)
+            return self.parameters.A_minus * (2**(float(delta_time) / self.parameters.tau_minus) - self.parameters.STDP_offset)
 
     # STDP weight update rule
     def update_synapse(self, synapse_weight, weight_factor):
