@@ -10,6 +10,7 @@ import tensorflow as tf
 
 from Neuron import Neuron
 from Parameters import Parameters
+from dtb import *
 
 
 class SNN:
@@ -96,17 +97,45 @@ class SNN:
 
     # STDP reinforcement learning curve
     def STDP_weighting_curve(self, delta_time: int):
+        if abs(delta_time) > 8 or abs(delta_time) <= 1:
+            return map_to_binary(0, 8)
         if delta_time > 0:
-            return -self.parameters.A_plus * (2**(-float(delta_time) / self.parameters.tau_plus) - self.parameters.STDP_offset)
+            val =  -self.parameters.A_plus * (2**(-float(delta_time) / self.parameters.tau_plus) - self.parameters.STDP_offset)
         if delta_time <= 0:
-            return self.parameters.A_minus * (2**(float(delta_time) / self.parameters.tau_minus) - self.parameters.STDP_offset)
+            val = self.parameters.A_minus * (2**(float(delta_time) / self.parameters.tau_minus) - self.parameters.STDP_offset)
+        if val >= 0:
+            return '0' + map_to_binary(val, 8)
+        else:
+            return '1' + map_to_binary(val, 8)
 
     # STDP weight update rule
     def update_synapse(self, synapse_weight, weight_factor):
-        if weight_factor < 0:
-            return synapse_weight + self.parameters.sigma * weight_factor * (synapse_weight - abs(self.parameters.min_weight)) ** self.parameters.mu
-        elif weight_factor > 0:
-            return synapse_weight + self.parameters.sigma * weight_factor * (self.parameters.max_weight - synapse_weight) ** self.parameters.mu
+
+        #discretize the min/max weights
+        min_weight_discretized = map_to_decimal('00000001')
+        max_weight_discretized = map_to_decimal('11111111')
+
+        x_shift = LZD(weight_factor[1:], 8)
+        try:
+            if weight_factor[0] == '1':
+                new_weight =  synapse_weight - map_to_decimal(rightShift(map_to_binary(float(synapse_weight - min_weight_discretized), 15), x_shift+7, 15))
+
+                if new_weight < min_weight_discretized:
+                    return min_weight_discretized
+                else:
+                    return new_weight
+            elif weight_factor[0] == '0':
+                new_weight = synapse_weight + map_to_decimal(rightShift(map_to_binary(float(max_weight_discretized - synapse_weight), 15), x_shift+7, 15))
+
+                if new_weight > max_weight_discretized:
+                    return max_weight_discretized
+                else:
+                    return new_weight
+        except ValueError:
+            print(max_weight_discretized)
+            print(min_weight_discretized)
+            print(synapse_weight)
+            raise ValueError
 
     def convert_weights_to_image(self, weights):
         weights = np.array(weights)

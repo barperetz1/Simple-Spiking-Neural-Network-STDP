@@ -36,12 +36,12 @@ class Parameters:
     hyperpolarization_potential = -90
     spike_drop_rate = 0.8
     threshold_drop_rate = 0.4
-    min_weight = 0.00001
+    min_weight = 1/256
     max_weight = 1.0
 
     # STDP Parameters
     STDP_offset = 0  # STDP Offset
-    sigma = 0.01  # STDP Learning Rate
+    sigma = 1/256  # STDP Learning Rate
     A_plus = 0.5  # Scaling Factor for Training Purposes - Decreasing Synpatic Weights
     A_minus = 0.5  # Scaling Factor for Training Purposes - Increasing Synpatic Weights
     tau_plus = 1  # STDP Time Constant in "μs" - Can be changed as Hyperparameter(?)
@@ -143,4 +143,3 @@ class Parameters:
         self.weight4 = weight4
         self.min_frequency = min_frequency
         self.max_frequency = max_frequency
-
