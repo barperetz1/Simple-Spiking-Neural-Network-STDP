@@ -94,7 +94,7 @@ class SNN:
                 convoluted_image[x_image_index][y_image_index] = summation
         return convoluted_image
 
-    # STDP reinforcement learning curve
+    #  reinforcement learning curve
     def STDP_weighting_curve(self, delta_time: int):
         if(delta_time <= 7 and delta_time >= -7):
             if delta_time > 0:
