@@ -10,7 +10,7 @@ import tensorflow as tf
 
 from Neuron import Neuron
 from Parameters import Parameters
-
+from dtb import *
 
 class SNN:
     def __init__(self, parameters: Parameters):
@@ -96,17 +96,32 @@ class SNN:
 
     # STDP reinforcement learning curve
     def STDP_weighting_curve(self, delta_time: int):
-        if delta_time > 0:
-            return -self.parameters.A_plus * (2**(-float(delta_time) / self.parameters.tau_plus) - self.parameters.STDP_offset)
-        if delta_time <= 0:
-            return self.parameters.A_minus * (2**(float(delta_time) / self.parameters.tau_minus) - self.parameters.STDP_offset)
+        if(delta_time <= 7 and delta_time >= -7):
+            if delta_time > 0:
+                sb = "0"
+            else:
+                sb = "1"
+
+            dt = (delta_time**2)**(1/2)
+            binary = "{0:b}".format(int(dt)).zfill(3)
+        return sb+binary
 
     # STDP weight update rule
     def update_synapse(self, synapse_weight, weight_factor):
-        if weight_factor < 0:
-            return synapse_weight + self.parameters.sigma * weight_factor * (synapse_weight - abs(self.parameters.min_weight)) ** self.parameters.mu
-        elif weight_factor > 0:
-            return synapse_weight + self.parameters.sigma * weight_factor * (self.parameters.max_weight - synapse_weight) ** self.parameters.mu
+        binary_weight = list(map_to_binary(synapse_weight, 8))
+        if bool(int(weight_factor[0])):
+            for i in range(3):
+                binary_weight[2-i-1] = str(int(bool(int(binary_weight[2-i-1])) and bool(int(weight_factor[2-i]))))
+            if(weight_factor[2] == '0'):
+                binary_weight = ['0'] + binary_weight[0:len(binary_weight)-1]
+        else:
+            for i in range(3):
+                binary_weight[2-i-1] = str(int(bool(int(binary_weight[2-i-1])) or bool(int(weight_factor[2-i]))))
+            if(weight_factor[2] == '1') and binary_weight[0] != '1':
+                binary_weight = binary_weight[1:] + ['0']
+        return map_to_decimal(''.join(binary_weight))
+
+
 
     def convert_weights_to_image(self, weights):
         weights = np.array(weights)
@@ -195,18 +210,20 @@ class SNN:
         # Starting training
         for epoch in range(self.parameters.epochs):
             print(f"epoch: {epoch}")
+
             # If data is not preprocessed, the data is going to be converted again for each epoch
             if not self.parameters.use_tf_dataset and not self.parameters.preprocessing_data:
                 X_train, Y_train = X_train_generator(), Y_train_generator()
                 X_test, Y_test = X_test_generator(), Y_test_generator()
 
             # Iterating over each image and coresponding label
-            i=0
+            i = 0
             for image, label in zip(X_train, Y_train):
                 time_start = time.time()
                 if i%20 == 0:
                     print(f"{i} images trained")
                 i += 1
+
                 if self.parameters.preprocessing_data:
                     spike_train = image
                 else:

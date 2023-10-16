@@ -22,7 +22,7 @@ class Parameters:
     # Simulation Parameters
     image_train_time = 350  # Training time for every image
     past_window = -5
-    epochs = 3
+    epochs = 5
 
     # Input Parameters
     image_size = (28, 28)
