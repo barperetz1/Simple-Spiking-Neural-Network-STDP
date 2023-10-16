@@ -118,14 +118,14 @@ class SNN:
         x_shift = LZD(weight_factor[1:], 8)
         try:
             if weight_factor[0] == '1':
-                new_weight =  synapse_weight - map_to_decimal(rightShift(map_to_binary(float(synapse_weight - min_weight_discretized), 15), x_shift+7, 15))
+                new_weight =  synapse_weight - map_to_decimal(rightShift(map_to_binary(float(synapse_weight - min_weight_discretized), 16), x_shift+6, 16))
 
                 if new_weight < min_weight_discretized:
                     return min_weight_discretized
                 else:
                     return new_weight
             elif weight_factor[0] == '0':
-                new_weight = synapse_weight + map_to_decimal(rightShift(map_to_binary(float(max_weight_discretized - synapse_weight), 15), x_shift+7, 15))
+                new_weight = synapse_weight + map_to_decimal(rightShift(map_to_binary(float(max_weight_discretized - synapse_weight), 16), x_shift+6, 16))
 
                 if new_weight > max_weight_discretized:
                     return max_weight_discretized
